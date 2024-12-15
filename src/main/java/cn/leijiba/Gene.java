@@ -6,16 +6,19 @@ import java.util.Arrays;
 
 public enum Gene {
     
-    G(9),
-    Y(9),
-    H(9),
-    X(10),
-    W(10);
+    G("G",9),
+    Y("Y",9),
+    H("H",9),
+    X("X",10),
+    W("W",10);
 
-    private final int weight; 
+    private String str = "";
+    private  final int weight; 
 
     
-    Gene(int weight) {
+    Gene(String str,int weight) 
+    {
+        this.str = str;
         this.weight = weight;
     }
 
@@ -23,9 +26,16 @@ public enum Gene {
         return this.weight;
     }
 
+    public String str() {
+        return this.str;
+    }
+
     public static void main(String[] args) {
         System.out.println();
         Gene[] values = Gene.values();
+        System.out.println(G.weight);
+        System.out.println("===========");
+        System.out.println(G.weight());
         Arrays.stream(values).forEach(System.out::println);
         
     }
