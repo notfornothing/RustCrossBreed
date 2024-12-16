@@ -1,7 +1,6 @@
 package cn.leijiba;
 
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -17,20 +16,43 @@ import static cn.leijiba.Gene.*;
  */
 
 /**
- * yyxw -> y
- * yyxx -> x
+ * TODO 1 考虑三角的情况 即3个就能确定一个，不一定要4个。（三个基因的种法，十字去掉就行的）
+ * TODO 2 考虑一代二代三代...的情况。
+ * TODO 3 OCR
  */
 public class App {
     public static void main(String[] args) {
 
 
         List<String> all = new ArrayList<String>();
-        all.add("GGGGGG");
-        all.add("yyyyyy");
-        all.add("hhhhhh");
-        all.add("Gxxxxx");
-
-        all.add("wYwwww");
+        all.add("gyywyh");
+        all.add("yhyyhx");
+        all.add("xyyyyh");
+        all.add("gwgyyg");
+        all.add("gygwhy");
+        all.add("ygywgw");
+        all.add("gygwyw");
+        all.add("hghggw");
+        all.add("hwyygg");
+        all.add("xhywyy");
+        all.add("gygyyx");
+        all.add("whgywh");
+        all.add("gyggww");
+        all.add("wyywyh");
+        all.add("gwgyyx");
+        all.add("gyyghx");
+        all.add("yhyhyw");
+        all.add("xygxyx");
+        all.add("gygyyx");
+        all.add("xyhyyx");
+        all.add("gwyygg");
+        all.add("hwyygx");
+        all.add("gygxyh");
+        all.add("wggxgx");
+        all.add("gwyygx");
+        all.add("gyywww");
+        all.add("hwyygg");
+        all.add("xyywgx");
 
         // 4个杂交2个基因相同的情况最多两次，3个相同的基因种子杂交没意义。因为权重肯定是3个相同的大
         all.addAll(all);
@@ -52,13 +74,13 @@ public class App {
                         ready.add(all.get(l));
 
                         List<List<Gene>> boxed = checkAndLoad(ready);
-                        System.out.println("=======");
+//                        System.out.println("=======");
                         // TODO 每一条基因可以是 set 因为是唯一的 (不一定是set自己与自己杂交也得考虑
                         List<String> lists = cross4(boxed);
-                        System.out.print("readyOut ====> ");
-                        lists.forEach(e -> System.out.print(e + " "));
-                        System.out.println();
-                        System.out.println("=======");
+//                        System.out.print("readyOut ====> ");
+//                        lists.forEach(e -> System.out.print(e + " "));
+//                        System.out.println();
+//                        System.out.println("=======");
 
                         List<Integer> collect = lists.stream().map(e -> {
                                     int score = 0;
@@ -108,8 +130,7 @@ public class App {
         // 输出最大 rate 的 Possible 对象集合
         System.out.println("具有最大 rate 的 Possible 对象集合：");
         maxPossibleList.forEach(System.out::println);
-        maxPossibleList.forEach(e->
-        {
+        maxPossibleList.forEach(e -> {
             System.out.println("=======");
             System.out.println("origin:");
             for (List<Gene> genes : e.origin) {
@@ -118,6 +139,8 @@ public class App {
             System.out.println("result:");
             System.out.println(e.result);
         });
+        System.out.println("总共可能 " + allPossible.size());
+        System.out.println("总共权重最大的可能 " + maxPossibleList.size());
     }
 
 
@@ -164,8 +187,8 @@ public class App {
         if (allGenesRows.size() != 4) {
             throw new RuntimeException("超出数量限制");
         }
-        System.out.println("四条基因分别为：");
-        allGenesRows.forEach(System.out::println);
+//        System.out.println("四条基因分别为：");
+//        allGenesRows.forEach(System.out::println);
         List<String> result = new ArrayList<>();
         for (int i = 0; i < 6; i++) {
             List<Gene> colResult = getColResult(allGenesRows, i);
@@ -230,8 +253,8 @@ public class App {
             }
         }
 
-        System.out.println("原始列基因：");
-        geneWeightMapBackUp.forEach((key, value) -> System.out.println(key + " " + value));
+//        System.out.println("原始列基因：");
+//        geneWeightMapBackUp.forEach((key, value) -> System.out.println(key + " " + value));
 
         //权重不相等的情况
         //不存在相等权重基因
@@ -242,7 +265,7 @@ public class App {
                     .orElseThrow(() -> new RuntimeException("无法找到最大权重基因"))
                     .getKey();
             geneWeightMap.entrySet().removeIf(e -> !e.getValue().equals(geneWeightMap.get(maxGene)));
-            System.out.println("Gene: " + maxGene + " weight:" + geneWeightMap.get(maxGene));
+//            System.out.println("Gene: " + maxGene + " weight:" + geneWeightMap.get(maxGene));
         }
 
         //存在相等权重基因
@@ -254,7 +277,7 @@ public class App {
             List<Gene> collect = geneWeightMap.entrySet().stream().filter(e -> e.getValue().equals(geneWeightMap.get(maxGene))).map(e -> e.getKey()).collect(Collectors.toList());
             //如果存在权重相等，只需找到权重最大的就行，故移除不等于最大的
             geneWeightMap.entrySet().removeIf(e -> !e.getValue().equals(geneWeightMap.get(maxGene)));
-            System.out.println("Gene: " + collect + " weight:" + geneWeightMap.get(maxGene));
+//            System.out.println("Gene: " + collect + " weight:" + geneWeightMap.get(maxGene));
         }
         return new ArrayList<>(geneWeightMap.keySet());
     }
