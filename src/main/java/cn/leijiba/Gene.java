@@ -6,9 +6,9 @@ import java.util.Arrays;
 
 public enum Gene {
     
-    G("G",9),
-    Y("Y",9),
-    H("H",9),
+    G("G",6),
+    Y("Y",6),
+    H("H",6),
     X("X",10),
     W("W",10);
 

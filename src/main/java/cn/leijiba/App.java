@@ -17,42 +17,27 @@ import static cn.leijiba.Gene.*;
 
 /**
  * TODO 1 考虑三角的情况 即3个就能确定一个，不一定要4个。（三个基因的种法，十字去掉就行的）
+ * (
+ * XYYYYH
+ * GWGYYG
+ * GYGWHY
+ * )
+ * TODO 基因在50%几率下 会被中间的基因影响
+ * 具体例子：
+ * HGY G --> G
+ * HGY X --> X
+ * XGYY X --> Y
  * TODO 2 考虑一代二代三代...的情况。
  * TODO 3 OCR
+ * TODO 4 origin 去重省资源
  */
 public class App {
     public static void main(String[] args) {
 
-
         List<String> all = new ArrayList<String>();
-        all.add("gyywyh");
-        all.add("yhyyhx");
-        all.add("xyyyyh");
-        all.add("gwgyyg");
-        all.add("gygwhy");
-        all.add("ygywgw");
-        all.add("gygwyw");
-        all.add("hghggw");
-        all.add("hwyygg");
-        all.add("xhywyy");
-        all.add("gygyyx");
-        all.add("whgywh");
-        all.add("gyggww");
-        all.add("wyywyh");
-        all.add("gwgyyx");
-        all.add("gyyghx");
-        all.add("yhyhyw");
-        all.add("xygxyx");
-        all.add("gygyyx");
-        all.add("xyhyyx");
-        all.add("gwyygg");
-        all.add("hwyygx");
-        all.add("gygxyh");
-        all.add("wggxgx");
-        all.add("gwyygx");
-        all.add("gyywww");
-        all.add("hwyygg");
-        all.add("xyywgx");
+all.add("XYYYYH");
+all.add("GWGYYG");
+all.add("GYGWHY");
 
         // 4个杂交2个基因相同的情况最多两次，3个相同的基因种子杂交没意义。因为权重肯定是3个相同的大
         all.addAll(all);
@@ -63,7 +48,52 @@ public class App {
 
         List<Possible> allPossible = new ArrayList<>();
 
+        // 3条基因的情况
+        for (int i = 0; i < all.size(); i++) {
+            ready.add(all.get(i));
+            for (int j = i + 1; j < all.size(); j++) {
+                ready.add(all.get(j));
+                for (int k = j + 1; k < all.size(); k++) {
+                    ready.add(all.get(k));
+                    List<List<Gene>> boxed = checkAndLoad(ready);
+//                        System.out.println("=======");
+                    // TODO 每一条基因可以是 set 因为是唯一的 (不一定是set自己与自己杂交也得考虑
+                    List<String> lists = cross3(boxed);
+//                        System.out.print("readyOut ====> ");
+//                        lists.forEach(e -> System.out.print(e + " "));
+//                        System.out.println();
+//                        System.out.println("=======");
 
+                    List<Integer> collect = lists.stream().map(e -> {
+                                int score = 0;
+                                RateGene[] values = RateGene.values();
+                                for (RateGene rate : values) {
+                                    if (e.contains(rate.str())) {
+                                        score += rate.weight();
+                                    } else {
+                                        ;
+                                    }
+                                }
+                                return score;
+                            }
+                    ).collect(Collectors.toList());
+
+                    Integer rate = collect.stream().reduce(0, Integer::sum);
+                    Possible possible = new Possible();
+                    possible.origin(boxed)
+                            .rate(rate)
+                            .result(lists);
+                    allPossible.add(possible);
+                    ready.remove(ready.size() - 1);
+                }
+                ready.remove(ready.size() - 1);
+            }
+            ready.remove(ready.size() - 1);
+        }
+
+        ready = new ArrayList<>();
+
+        // 4条基因的情况
         for (int i = 0; i < all.size(); i++) {
             ready.add(all.get(i));
             for (int j = i + 1; j < all.size(); j++) {
@@ -182,6 +212,22 @@ public class App {
     }
 
 
+    public static List<String> cross3(List<List<Gene>> allGenesRows) {
+        if (allGenesRows.size() != 3) {
+            throw new RuntimeException("超出数量限制");
+        }
+//        System.out.println("四条基因分别为：");
+//        allGenesRows.forEach(System.out::println);
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            List<Gene> colResult = getColResult(allGenesRows, i);
+            List<String> collect = colResult.stream().map(e -> e.str()).collect(Collectors.toList());
+            String resultOneCol = collect.stream().collect(Collectors.joining("/"));
+            result.add(resultOneCol);
+        }
+        return result;
+    }
+    
     // 先算4个杂交后的 再去做前置入口
     public static List<String> cross4(List<List<Gene>> allGenesRows) {
         if (allGenesRows.size() != 4) {
